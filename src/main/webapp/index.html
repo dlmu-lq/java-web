@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .form-label{
+            display: inline-block;
+            width: 117px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div>
+        <span class="form-label">method:</span>
+        <select name="method">
+            <option>POST</option>
+            <option>GET</option>
+        </select>
+    </div>
+    <div>
+        <span class="form-label">url:</span>
+        <input name="url"/>
+    </div>
+    <div>
+        <span class="form-label">params:</span>
+        <textarea name="params" style="height: 100px"></textarea>
+    </div>
+    <div>
+        <span class="form-label">content-type:</span>
+        <select name="contentType">
+            <option>application/json</option>
+            <option>application/x-www-form-urlencoded</option>
+            <!--<option>multipart/form-data</option> todo -->
+            <!--<option>text/xml</option> todo -->
+            <option>text/plain</option>
+        </select>
+    </div>
+    <div>
+        <span class="form-label">response:</span>
+        <textarea name="response" style="width: 300px;height: 200px"></textarea>
+    </div>
+    <div>
+        <button id="submitButton">submit</button>
+    </div>
+</div>
+</body>
+<script>
+    window.onload = function (ev) {
+        document.querySelector("#submitButton").addEventListener("click",function (evt) {
+            var method = document.querySelector("select[name=method]").selectedOptions[0].value;
+            var url = document.querySelector("input[name=url]").value;
+            var params = document.querySelector("textarea[name=params]").value;
+            var responseEl = document.querySelector("textarea[name=response]");
+            var xhr = new XMLHttpRequest();
+            xhr.open(method,url);
+            if(method === "POST"){
+                var contentType = document.querySelector("select[name=contentType]").selectedOptions[0].value;
+                if(contentType != "default"){
+                    xhr.setRequestHeader("content-type", contentType);
+                }
+                xhr.send(params);
+            }else{
+                xhr.send(null);
+            }
+            xhr.onreadystatechange = function (ev1) {
+                if(xhr.readyState === 4){
+                    responseEl.value = "status:" + xhr.status + "\r" +
+                        "responseText:" + xhr.responseText;
+                }
+            }
+        })
+    }
+</script>
+</html>
