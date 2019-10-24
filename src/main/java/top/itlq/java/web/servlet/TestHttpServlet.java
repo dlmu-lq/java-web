@@ -1,4 +1,4 @@
-package top.itlq.javaweb.servlet;
+package top.itlq.java.web.servlet;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
