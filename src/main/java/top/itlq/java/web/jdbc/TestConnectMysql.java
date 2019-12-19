@@ -20,25 +20,26 @@ public class TestConnectMysql {
     private Formatter formatter = new Formatter(System.out);
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    @BeforeAll
-    static void beforeAll(){
-        Properties properties = new Properties();
-
-        try (
-                InputStream inputStream = DBUtils.class.getResourceAsStream("/jdbc.properties");
-        ){
-            properties.load(inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("jdbc数据读取失败，确保classpath下有jdbc.properties文件");
-        }
-        DBUtils.connect(properties.getProperty("url"),
-                properties.getProperty("user"),properties.getProperty("password"));
-    }
-
     @Test
     void testSelect() throws SQLException {
         ResultSet resultSet = DBUtils.selectAllFromUser();
+        String format =  "%-5s%-10s%-10s%-20s";
+        formatter.format(format,"id","name","age","birth");
+        System.out.println();
+        while (resultSet.next()){
+            formatter.format(format,
+                    resultSet.getInt("id"),
+                    resultSet.getString("name"),
+                    resultSet.getInt("age"),
+                    simpleDateFormat.format(resultSet.getDate("birth"))
+            );
+            System.out.println();
+        }
+    }
+
+    @Test
+    void testSelectWithDataSource() throws SQLException {
+        ResultSet resultSet = DataSourceUtils.selectAllFromUser();
         String format =  "%-5s%-10s%-10s%-20s";
         formatter.format(format,"id","name","age","birth");
         System.out.println();

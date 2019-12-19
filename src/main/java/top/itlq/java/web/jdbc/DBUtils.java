@@ -1,20 +1,34 @@
 package top.itlq.java.web.jdbc;
 
+import org.junit.jupiter.api.BeforeAll;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
+import java.util.Properties;
 
 /**
  * jdbc 简单操作数据库
  */
-public class DBUtils implements AutoCloseable{
+public class DBUtils {
 
-    private static Connection connection;
+    // 连接加载类时即创建，不关闭；线程安全问题？，见DataSourceUtils
+    private static final Connection connection;
 
-    public static void connect(String url, String user, String password){
-        try {
+    static {
+        Properties properties = new Properties();
+        try(
+                InputStream inputStream = DBUtils.class.getResourceAsStream("/jdbc.properties");
+        ) {
 //             不再必须，DriverManager 在 getConnection 时会自动加载驱动
 //            Class.forName("org.mariadb.jdbc.Driver");
 //            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection(url,user,password);
+            properties.load(inputStream);
+            connection = DriverManager.getConnection(properties.getProperty("url"),
+                    properties.getProperty("user"),properties.getProperty("password"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("jdbc数据读取失败，确保classpath下有jdbc.properties文件");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("数据库连接失败！");
@@ -22,6 +36,8 @@ public class DBUtils implements AutoCloseable{
     }
 
     /**
+     *
+     *
      * 简单查询测试
      * @return
      */
@@ -87,10 +103,5 @@ public class DBUtils implements AutoCloseable{
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
         }
-    }
-
-    @Override
-    public void close() throws Exception {
-
     }
 }
